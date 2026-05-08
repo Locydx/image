@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎲 随机图片选择器 · 云端同步</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap');
+        :root {
+            --bg:#0d1117; --surface:#161b22; --surface2:#21262d; --border:#30363d;
+            --text:#e6edf3; --text-sub:#8b949e; --primary:#58a6ff;
+            --primary-glow:rgba(88,166,255,0.15); --accent:#f0883e;
+            --accent-glow:rgba(240,136,62,0.2); --success:#3fb950;
+            --danger:#f85149; --radius:10px; --radius-lg:16px;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+        /* ── 登录界面 ── */
+        #loginScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;}
+        .login-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px 36px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,0.5);}
+        .login-logo{text-align:center;font-size:2.5rem;margin-bottom:8px;}
+        .login-title{text-align:center;font-size:1.15rem;font-weight:700;margin-bottom:4px;}
+        .login-sub{text-align:center;font-size:0.78rem;color:var(--text-sub);margin-bottom:28px;line-height:1.6;}
+        .lbl{font-size:0.78rem;color:var(--text-sub);margin-bottom:5px;display:block;}
+        .li{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:11px 14px;color:var(--text);font-size:0.85rem;font-family:'Space Mono',monospace;outline:none;transition:border-color .2s;margin-bottom:13px;}
+        .li:focus{border-color:var(--primary);}
+        .li::placeholder{color:var(--text-sub);opacity:.5;}
+        .row-2{display:flex;gap:10px;margin-bottom:0;}
+        .row-2 .li{margin-bottom:0;}
+        .row-2 .lbl{margin-bottom:5px;}
+        .row-2 > div{flex:1;}
+        .row-2-wrap{margin-bottom:13px;}
+        .remember{display:flex;align-items:center;gap:8px;font-size:0.77rem;color:var(--text-sub);cursor:pointer;margin-bottom:6px;}
+        .remember input{cursor:pointer;accent-color:var(--primary);}
+        .login-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--primary),#3b82f6);color:#fff;border:none;border-radius:30px;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:'Noto Sans SC',sans-serif;transition:opacity .2s,transform .1s;box-shadow:0 4px 20px rgba(88,166,255,0.3);}
+        .login-btn:hover{opacity:.9;}
+        .login-btn:active{transform:scale(.98);}
+        .login-err{background:rgba(248,81,73,0.1);border:1px solid rgba(248,81,73,0.3);border-radius:var(--radius);color:var(--danger);font-size:0.78rem;padding:9px 14px;margin-top:12px;display:none;}
+        .login-tip{margin-top:18px;padding-top:16px;border-top:1px solid var(--border);font-size:0.72rem;color:var(--text-sub);line-height:1.7;}
+        .login-tip a{color:var(--primary);text-decoration:none;}
+        .login-tip a:hover{text-decoration:underline;}
+
+        /* ── 主界面 ── */
+        #appScreen{display:none;}
+        .navbar{background:rgba(13,17,23,.85);backdrop-filter:blur(16px);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+        .logo{font-family:'Space Mono',monospace;font-weight:700;font-size:1rem;color:var(--primary);display:flex;align-items:center;gap:8px;}
+        .logo span{color:var(--text);}
+        .nav-right{display:flex;align-items:center;gap:10px;}
+        .count-badge{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--primary);}
+        .sync-badge{font-size:.75rem;padding:3px 10px;border-radius:20px;border:1px solid transparent;transition:all .3s;}
+        .sync-badge.synced{background:rgba(63,185,80,.1);border-color:rgba(63,185,80,.3);color:var(--success);}
+        .sync-badge.syncing{background:rgba(88,166,255,.1);border-color:rgba(88,166,255,.3);color:var(--primary);animation:pulse 1.2s infinite;}
+        .sync-badge.error{background:rgba(248,81,73,.1);border-color:rgba(248,81,73,.3);color:var(--danger);}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+        .btn-nav{background:none;border:1px solid var(--border);color:var(--text-sub);border-radius:20px;padding:4px 14px;font-size:.78rem;cursor:pointer;transition:all .2s;font-family:'Noto Sans SC',sans-serif;}
+        .btn-nav:hover{border-color:var(--danger);color:var(--danger);background:rgba(248,81,73,.07);}
+        .btn-nav.soft:hover{border-color:var(--text-sub);color:var(--text);background:var(--surface2);}
+        .main{display:flex;gap:20px;padding:20px 24px;max-width:1280px;margin:0 auto;}
+        .left{flex:1;min-width:0;}.right{width:280px;flex-shrink:0;}
+        .source-tabs{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px;}
+        .tab-btn{flex:1;padding:10px;background:none;border:none;color:var(--text-sub);font-size:.82rem;cursor:pointer;transition:all .2s;border-right:1px solid var(--border);font-family:'Noto Sans SC',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;}
+        .tab-btn:last-child{border-right:none;}
+        .tab-btn.active{background:var(--primary-glow);color:var(--primary);font-weight:700;}
+        .tab-btn:hover:not(.active){background:var(--surface2);color:var(--text);}
+        .upload-zone{background:var(--surface);border:2px dashed var(--border);border-radius:var(--radius-lg);padding:32px 20px;text-align:center;cursor:pointer;transition:all .25s;}
+        .upload-zone:hover,.upload-zone.drag-over{border-color:var(--primary);background:var(--primary-glow);}
+        .upload-icon{font-size:2.5rem;margin-bottom:10px;line-height:1;}
+        .upload-zone h3{font-size:.95rem;font-weight:700;margin-bottom:6px;}
+        .upload-zone p{font-size:.78rem;color:var(--text-sub);}
+        .format-tags{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:12px;}
+        .format-tag{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:.7rem;font-family:'Space Mono',monospace;color:var(--text-sub);}
+        .paste-zone{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-lg);padding:20px;transition:all .25s;}
+        .paste-zone.paste-active{border-color:var(--accent);background:var(--accent-glow);}
+        .paste-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+        .paste-header h3{font-size:.9rem;font-weight:700;}
+        .paste-hint{font-size:.78rem;color:var(--text-sub);line-height:1.6;}
+        .paste-preview-strip{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+        .paste-thumb{width:60px;height:60px;border-radius:8px;object-fit:cover;border:2px solid var(--border);animation:popIn .25s ease;}
+        @keyframes popIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+        .url-zone{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;}
+        .url-zone h3{font-size:.9rem;font-weight:700;margin-bottom:12px;}
+        .url-input-row{display:flex;gap:8px;}
+        .url-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:9px 14px;color:var(--text);font-size:.82rem;font-family:'Space Mono',monospace;outline:none;transition:border-color .2s;}
+        .url-input:focus{border-color:var(--primary);}
+        .url-input::placeholder{color:var(--text-sub);}
+        .btn-add{background:var(--primary);color:#fff;border:none;border-radius:var(--radius);padding:9px 16px;font-size:.82rem;cursor:pointer;font-weight:700;font-family:'Noto Sans SC',sans-serif;white-space:nowrap;}
+        .gallery-header{display:flex;align-items:center;justify-content:space-between;margin:16px 0 10px;}
+        .gallery-header h3{font-size:.85rem;color:var(--text-sub);font-weight:500;}
+        .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;}
+        .gallery-item{aspect-ratio:1;border-radius:var(--radius);overflow:hidden;background:var(--surface2);position:relative;border:2px solid var(--border);transition:border-color .2s,transform .2s;cursor:pointer;}
+        .gallery-item:hover{border-color:var(--primary);transform:scale(1.03);}
+        .gallery-item.selected{border-color:var(--accent);box-shadow:0 0 16px var(--accent-glow);}
+        .gallery-item img{width:100%;height:100%;object-fit:cover;display:block;}
+        .item-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:0;transition:opacity .2s;}
+        .gallery-item:hover .item-overlay{opacity:1;}
+        .del-btn{background:var(--danger);color:#fff;border:none;border-radius:20px;padding:4px 12px;font-size:.72rem;cursor:pointer;font-family:'Noto Sans SC',sans-serif;}
+        .item-source{font-size:.6rem;color:rgba(255,255,255,.7);font-family:'Space Mono',monospace;background:rgba(0,0,0,.4);padding:2px 6px;border-radius:4px;}
+        .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;text-align:center;}
+        .preview-wrap{width:100%;aspect-ratio:1;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface2);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:16px;}
+        .preview-wrap img{max-width:100%;max-height:100%;object-fit:contain;transition:opacity .3s;}
+        .preview-placeholder{color:var(--text-sub);font-size:3rem;}
+        .preview-name{font-size:.72rem;color:var(--text-sub);margin-bottom:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Space Mono',monospace;}
+        .btn-random{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),#e05c1a);color:#fff;border:none;border-radius:30px;font-size:.95rem;font-weight:900;cursor:pointer;letter-spacing:1px;transition:opacity .2s,transform .1s;font-family:'Noto Sans SC',sans-serif;box-shadow:0 4px 20px rgba(240,136,62,.3);}
+        .btn-random:hover:not(:disabled){opacity:.9;transform:scale(1.02);}
+        .btn-random:active:not(:disabled){transform:scale(.98);}
+        .btn-random:disabled{background:var(--surface2);color:var(--text-sub);cursor:not-allowed;box-shadow:none;}
+        .stats{margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+        .stat-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:8px;text-align:center;}
+        .stat-val{font-size:1.2rem;font-weight:900;color:var(--primary);font-family:'Space Mono',monospace;}
+        .stat-lbl{font-size:.65rem;color:var(--text-sub);margin-top:2px;}
+        .toast{position:fixed;top:70px;right:20px;padding:10px 18px;border-radius:25px;font-size:.82rem;z-index:9999;animation:slideIn .3s ease;pointer-events:none;}
+        @keyframes slideIn{from{transform:translateX(30px);opacity:0}to{transform:translateX(0);opacity:1}}
+        .progress-bar{height:3px;background:var(--primary);width:0%;transition:width .3s;border-radius:2px;margin-bottom:10px;}
+        @media(max-width:768px){.main{flex-direction:column;}.right{width:100%;}}
+    </style>
+</head>
+<body>
+
+<!-- ══════════ 登录界面 ══════════ -->
+<div id="loginScreen">
+    <div class="login-card">
+        <div class="login-logo">🎲</div>
+        <div class="login-title">随机图片选择器</div>
+        <div class="login-sub">输入 GitHub 配置连接云端图库<br><span style="color:#f0883e;font-size:.7rem;">⚠️ Token 仅存于内存，不写入任何文件，安全可用于公开仓库</span></div>
+
+        <label class="lbl">GitHub 用户名</label>
+        <input class="li" id="loginUser" type="text" placeholder="例如: zhangsan">
+
+        <div class="row-2-wrap">
+            <div class="row-2">
+                <div>
+                    <label class="lbl">仓库名</label>
+                    <input class="li" id="loginRepo" type="text" placeholder="例如: image">
+                </div>
+                <div>
+                    <label class="lbl">分支</label>
+                    <input class="li" id="loginBranch" type="text" placeholder="main" value="main">
+                </div>
+            </div>
+        </div>
+
+        <label class="lbl">图片存放路径</label>
+        <input class="li" id="loginPath" type="text" placeholder="images/" value="images/">
+
+        <label class="lbl">Personal Access Token（ghp_...）</label>
+        <input class="li" id="loginToken" type="password" placeholder="ghp_xxxxxxxxxxxxxxxx">
+
+        <label class="remember">
+            <input type="checkbox" id="rememberMe"> 记住登录信息（保存到本地 localStorage）
+        </label>
+
+        <button class="login-btn" id="loginBtn" onclick="doLogin()">🔑 连接云端图库</button>
+        <div class="login-err" id="loginErr"></div>
+
+        <div class="login-tip">
+            没有 Token？前往
+            <a href="https://github.com/settings/tokens/new" target="_blank">GitHub → Settings → Developer settings → Personal access tokens (classic)</a>，
+            勾选 <strong>repo</strong> 权限生成。<br><br>
+            💡 此页面 Token 仅存于浏览器内存，关闭标签页即消失，不会出现在代码里。
+        </div>
+    </div>
+</div>
+
+<!-- ══════════ 主界面 ══════════ -->
+<div id="appScreen">
+    <nav class="navbar">
+        <div class="logo">🎲 <span>随机图片选</span></div>
+        <div class="nav-right">
+            <span class="count-badge" id="imageCount">0 张</span>
+            <span class="sync-badge" id="syncStatus"></span>
+            <button class="btn-nav" onclick="clearAll()">清空全部</button>
+            <button class="btn-nav soft" onclick="doLogout()">退出登录</button>
+            <input type="file" id="fileInput" accept="image/*,.heic,.heif,.avif,.tiff,.tif,.bmp,.ico,.svg,.raw,.cr2,.nef,.arw,.dng,.orf,.pef,.rw2" multiple style="display:none;">
+        </div>
+    </nav>
+
+    <div class="main">
+        <div class="left">
+            <div class="source-tabs">
+                <button class="tab-btn active" onclick="switchTab('upload')" id="tab-upload">📁 本地上传</button>
+                <button class="tab-btn" onclick="switchTab('paste')" id="tab-paste">📋 粘贴图片</button>
+                <button class="tab-btn" onclick="switchTab('url')" id="tab-url">🔗 图片链接</button>
+            </div>
+
+            <div id="panel-upload">
+                <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">📂</div>
+                    <h3>点击选择 或 拖拽图片到此处</h3>
+                    <p>支持批量上传，永久保存至 GitHub 云端</p>
+                    <div class="format-tags">
+                        <span class="format-tag">JPG</span><span class="format-tag">PNG</span><span class="format-tag">GIF</span>
+                        <span class="format-tag">WEBP</span><span class="format-tag">SVG</span><span class="format-tag">BMP</span>
+                        <span class="format-tag">HEIC</span><span class="format-tag">AVIF</span><span class="format-tag">TIFF</span>
+                        <span class="format-tag">ICO</span><span class="format-tag">RAW</span><span class="format-tag">+更多</span>
+                    </div>
+                </div>
+                <div class="progress-bar" id="uploadProgress"></div>
+            </div>
+
+            <div id="panel-paste" style="display:none;">
+                <div class="paste-zone" id="pasteZone">
+                    <div class="paste-header">
+                        <span style="font-size:1.4rem;">📋</span>
+                        <h3>粘贴图片 · 即传即用</h3>
+                    </div>
+                    <p class="paste-hint">
+                        ① 截图后直接 <strong>Ctrl+V</strong>（Mac: Cmd+V）<br>
+                        ② 从文件管理器复制图片后粘贴<br>
+                        ③ 浏览器中右键图片 → 复制图片 → 粘贴<br>
+                        ④ 粘贴图片 URL 文本（自动识别添加）
+                    </p>
+                    <div class="paste-preview-strip" id="pastePreviewStrip"></div>
+                </div>
+                <div class="progress-bar" id="pasteProgress"></div>
+            </div>
+
+            <div id="panel-url" style="display:none;">
+                <div class="url-zone">
+                    <h3>🔗 通过链接添加图片</h3>
+                    <div class="url-input-row">
+                        <input class="url-input" id="urlInput" type="text" placeholder="https://example.com/image.jpg">
+                        <button class="btn-add" onclick="addByUrl()">+ 添加</button>
+                    </div>
+                    <p style="font-size:.73rem;color:var(--text-sub);margin-top:10px;">仅本次会话有效，不上传至 GitHub</p>
+                </div>
+            </div>
+
+            <div class="gallery-header">
+                <h3 id="galleryLabel">图库</h3>
+            </div>
+            <div class="gallery" id="gallery"></div>
+        </div>
+
+        <div class="right">
+            <div class="card">
+                <div class="preview-wrap" id="previewWrap">
+                    <span class="preview-placeholder">❓</span>
+                </div>
+                <div class="preview-name" id="previewName">尚未抽取</div>
+                <button class="btn-random" id="randomBtn" disabled onclick="randomPick()">🎰 随机抽取</button>
+                <div class="stats">
+                    <div class="stat-item"><div class="stat-val" id="statTotal">0</div><div class="stat-lbl">图片总数</div></div>
+                    <div class="stat-item"><div class="stat-val" id="statPicks">0</div><div class="stat-lbl">已抽次数</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ══ 运行时配置（只存内存）══
+let CFG = {user:'',repo:'',branch:'main',path:'images/',token:''};
+let images=[], pickCount=0, localIdCounter=0;
+
+// ══ 初始化：尝试读取已记住的配置 ══
+window.addEventListener('DOMContentLoaded', () => {
+    try {
+        const s = JSON.parse(localStorage.getItem('gh_cfg') || 'null');
+        if (s && s.token) {
+            document.getElementById('loginUser').value   = s.user   || '';
+            document.getElementById('loginRepo').value   = s.repo   || '';
+            document.getElementById('loginBranch').value = s.branch || 'main';
+            document.getElementById('loginPath').value   = s.path   || 'images/';
+            document.getElementById('loginToken').value  = s.token  || '';
+            document.getElementById('rememberMe').checked = true;
+        }
+    } catch(e){}
+});
+
+// ══ 登录 ══
+async function doLogin() {
+    const user   = document.getElementById('loginUser').value.trim();
+    const repo   = document.getElementById('loginRepo').value.trim();
+    const branch = document.getElementById('loginBranch').value.trim() || 'main';
+    const path   = document.getElementById('loginPath').value.trim().replace(/\/?$/,'/');
+    const token  = document.getElementById('loginToken').value.trim();
+    const errEl  = document.getElementById('loginErr');
+    const btn    = document.getElementById('loginBtn');
+
+    if (!user || !repo || !token) {
+        errEl.style.display='block';
+        errEl.textContent='用户名、仓库名、Token 均不能为空';
+        return;
+    }
+    errEl.style.display='none';
+    btn.textContent='⟳ 验证中...'; btn.disabled=true;
+
+    try {
+        const res = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${path}`,
+            {headers:{Authorization:`token ${token}`}});
+        if (res.status===401) throw new Error('Token 无效或已过期，请重新生成');
+        if (res.status===404) throw new Error('仓库或路径不存在，请检查仓库名和路径');
+        if (!res.ok)          throw new Error(`连接失败（${res.status}）`);
+    } catch(e) {
+        errEl.style.display='block'; errEl.textContent='✕ '+e.message;
+        btn.textContent='🔑 连接云端图库'; btn.disabled=false; return;
+    }
+
+    CFG = {user, repo, branch, path, token};
+
+    if (document.getElementById('rememberMe').checked) {
+        localStorage.setItem('gh_cfg', JSON.stringify(CFG));
+    } else {
+        localStorage.removeItem('gh_cfg');
+    }
+
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('appScreen').style.display='block';
+    btn.textContent='🔑 连接云端图库'; btn.disabled=false;
+    fetchImages();
+}
+
+function doLogout() {
+    CFG={user:'',repo:'',branch:'main',path:'images/',token:''};
+    images=[]; pickCount=0;
+    document.getElementById('appScreen').style.display='none';
+    document.getElementById('loginScreen').style.display='flex';
+    document.getElementById('loginToken').value='';
+    document.getElementById('rememberMe').checked=false;
+    localStorage.removeItem('gh_cfg');
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key==='Enter' && document.getElementById('loginScreen').style.display!=='none') doLogin();
+});
+
+// ══ Tab ══
+function switchTab(name) {
+    ['upload','paste','url'].forEach(t=>{
+        document.getElementById('panel-'+t).style.display = t===name?'block':'none';
+        document.getElementById('tab-'+t).classList.toggle('active', t===name);
+    });
+}
+
+// ══ 渲染图库 ══
+function renderGallery() {
+    const g = document.getElementById('gallery');
+    g.innerHTML = images.length===0
+        ? `<div style="grid-column:1/-1;color:var(--text-sub);font-size:.82rem;padding:20px 0;text-align:center;">还没有图片，快去上传吧～</div>`
+        : images.map(img=>`
+            <div class="gallery-item" id="item-${img.id}" onclick="previewImg('${img.id}')">
+                <img src="${img.url}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22/>'">
+                <div class="item-overlay">
+                    <span class="item-source">${img.source}</span>
+                    <button class="del-btn" onclick="event.stopPropagation();removeImage('${img.id}')">删除</button>
+                </div>
+            </div>`).join('');
+    document.getElementById('randomBtn').disabled = images.length===0;
+    document.getElementById('statTotal').textContent = images.length;
+    document.getElementById('imageCount').textContent = images.length+' 张';
+    document.getElementById('galleryLabel').textContent = `图库（${images.length} 张）`;
+}
+
+function previewImg(id) {
+    const img=images.find(i=>i.id===id); if(!img) return;
+    document.querySelectorAll('.gallery-item').forEach(el=>el.classList.remove('selected'));
+    document.getElementById('item-'+id)?.classList.add('selected');
+    showPreview(img);
+}
+function showPreview(img) {
+    document.getElementById('previewWrap').innerHTML=`<img src="${img.url}" alt="${img.name}">`;
+    document.getElementById('previewName').textContent=img.name||img.url;
+}
+
+// ══ 随机抽取 ══
+function randomPick() {
+    if(!images.length) return;
+    pickCount++; document.getElementById('statPicks').textContent=pickCount;
+    const img=images[Math.floor(Math.random()*images.length)];
+    const wrap=document.getElementById('previewWrap');
+    wrap.style.opacity='.3';
+    setTimeout(()=>{wrap.style.opacity='1'; showPreview(img);},200);
+    document.querySelectorAll('.gallery-item').forEach(el=>el.classList.remove('selected'));
+    document.getElementById('item-'+img.id)?.classList.add('selected');
+    document.getElementById('item-'+img.id)?.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ══ GitHub API ══
+const apiUrl = p => `https://api.github.com/repos/${CFG.user}/${CFG.repo}/contents/${p}`;
+// 带时间戳防缓存，确保每次拿到最新数据
+const apiUrlFresh = p => apiUrl(p) + '?t=' + Date.now();
+const authH  = () => ({Authorization:`token ${CFG.token}`,'Content-Type':'application/json'});
+
+// 拉取图片列表，支持重试（上传后 GitHub 有短暂索引延迟）
+async function fetchImages(expectedCount=null, retries=4) {
+    setSyncStatus('syncing','⟳ 同步中');
+    for(let i=0; i<=retries; i++){
+        try {
+            const res=await fetch(apiUrlFresh(CFG.path),{headers:authH(),cache:'no-store'});
+            if(!res.ok) throw new Error(res.status);
+            const files=await res.json();
+            const remote=files
+                .filter(f=>f.type==='file'&&f.name.match(/\.(png|jpg|jpeg|gif|webp|avif|bmp|ico|svg|tiff?|heic|heif)$/i))
+                .map(f=>({id:'gh-'+f.sha.slice(0,8),name:f.name,url:f.download_url,sha:f.sha,source:'GitHub'}));
+            // 如果期望数量不对且还有重试次数，等待后重试
+            if(expectedCount!==null && remote.length<expectedCount && i<retries){
+                await new Promise(r=>setTimeout(r, 1200));
+                continue;
+            }
+            images=[...remote,...images.filter(i=>i.source!=='GitHub')];
+            renderGallery(); setSyncStatus('synced','☁️ 已同步');
+            return;
+        } catch(e){
+            if(i===retries) setSyncStatus('error','✕ 同步失败');
+            else await new Promise(r=>setTimeout(r,1000));
+        }
+    }
+}
+
+async function uploadToGitHub(file, progressId, localId=null) {
+    const ext=(file.name||'image').split('.').pop().toLowerCase()||'png';
+    const name=Date.now()+'-'+Math.random().toString(36).slice(2,7)+'.'+ext;
+    const base64=await new Promise((res,rej)=>{
+        const r=new FileReader(); r.onload=e=>res(e.target.result.split(',')[1]); r.onerror=rej; r.readAsDataURL(file);
+    });
+    setProgress(progressId,60);
+    const resp=await fetch(apiUrl(CFG.path+name),{
+        method:'PUT', headers:authH(),
+        body:JSON.stringify({message:`上传 ${name}`,content:base64,branch:CFG.branch})
+    });
+    setProgress(progressId,100); setTimeout(()=>setProgress(progressId,0),600);
+    if(resp.ok){
+        const data=await resp.json();
+        // 上传成功后立即将本地临时条目升级为 GitHub 条目，无需等待 fetchImages
+        const newSha = data.content?.sha || '';
+        const newUrl = data.content?.download_url || (localId ? (images.find(i=>i.id===localId)?.url||'') : '');
+        const newId  = 'gh-'+(newSha.slice(0,8)||name.slice(0,8));
+        if(localId){
+            const idx=images.findIndex(i=>i.id===localId);
+            if(idx!==-1) images[idx]={id:newId,name,url:newUrl,sha:newSha,source:'GitHub'};
+        } else {
+            images.push({id:newId,name,url:newUrl,sha:newSha,source:'GitHub'});
+        }
+        renderGallery();
+        showToast('✓ 上传成功: '+name,'success');
+        // 后台静默刷新，不影响当前显示
+        fetchImages().catch(()=>{});
+    } else {
+        if(localId){ images=images.filter(i=>i.id!==localId); renderGallery(); }
+        const e=await resp.json(); showToast('✕ 上传失败: '+(e.message||'未知错误'),'error');
+    }
+}
+
+function addLocalImage(file) {
+    const id='local-'+(++localIdCounter);
+    const name=file.name||('粘贴-'+localIdCounter);
+    images.push({id, name, url:URL.createObjectURL(file), sha:null, source:'本地'});
+    renderGallery();
+    return id; // 返回 id 供上传后升级用
+}
+
+// ══ 粘贴 ══
+function handlePaste(e) {
+    const items=e.clipboardData?.items; if(!items) return;
+    let handled=false;
+    for(const item of items) {
+        if(item.kind==='file'&&item.type.startsWith('image/')) {
+            const blob=item.getAsFile(); if(!blob) continue;
+            const localId=addLocalImage(blob);
+            uploadToGitHub(blob,'pasteProgress',localId);
+            addPasteThumb(blob); handled=true;
+        }
+    }
+    if(!handled) {
+        for(const item of items) {
+            if(item.kind==='string'&&item.type==='text/plain') {
+                item.getAsString(t=>t.trim().split('\n').map(s=>s.trim()).filter(isImgUrl).forEach(addImageByUrl));
+            }
+        }
+    }
+}
+function addPasteThumb(blob) {
+    const strip=document.getElementById('pastePreviewStrip');
+    const img=document.createElement('img'); img.className='paste-thumb'; img.src=URL.createObjectURL(blob);
+    strip.prepend(img); if(strip.children.length>8) strip.lastChild.remove();
+}
+
+// ══ URL ══
+const isImgUrl = s => { try{ return new URL(s).protocol.startsWith('http'); }catch{return false;} };
+function addByUrl() {
+    const inp=document.getElementById('urlInput');
+    inp.value.trim().split('\n').map(s=>s.trim()).filter(Boolean).forEach(addImageByUrl);
+    inp.value='';
+}
+function addImageByUrl(url) {
+    if(!isImgUrl(url)){ showToast('无效的图片链接','error'); return; }
+    if(images.find(i=>i.url===url)){ showToast('图片已在图库中','error'); return; }
+    const id='url-'+(++localIdCounter), name=url.split('/').pop().split('?')[0]||'url-image';
+    images.push({id, name, url, sha:null, source:'URL'}); renderGallery();
+    showToast('✓ 已添加链接图片','success');
+}
+
+// ══ 删除 ══
+// 删除前先实时查询文件最新 sha，避免缓存导致的 sha 过期错误
+async function getLatestSha(filename) {
+    try {
+        const res=await fetch(apiUrlFresh(CFG.path+filename),{headers:authH(),cache:'no-store'});
+        if(!res.ok) return null;
+        const data=await res.json();
+        return data.sha||null;
+    } catch(e){ return null; }
+}
+
+async function removeImage(id) {
+    const img=images.find(i=>i.id===id); if(!img) return;
+    if(img.source==='GitHub') {
+        if(!confirm(`删除云端图片：${img.name}？`)) return;
+        setSyncStatus('syncing','⟳ 删除中');
+        // 实时获取最新 sha
+        const latestSha = await getLatestSha(img.name);
+        if(!latestSha){ showToast('✕ 获取文件信息失败，请重试','error'); setSyncStatus('error','✕ 删除失败'); return; }
+        const res=await fetch(apiUrl(CFG.path+img.name),{method:'DELETE',headers:authH(),
+            body:JSON.stringify({message:`删除 ${img.name}`,sha:latestSha,branch:CFG.branch})});
+        if(res.ok){
+            showToast('✓ 已删除','success');
+            const ghCount = images.filter(i=>i.source==='GitHub').length;
+            await fetchImages(ghCount-1);
+        } else {
+            const e=await res.json();
+            showToast('✕ 删除失败: '+(e.message||'未知'),'error');
+            setSyncStatus('error','✕ 删除失败');
+        }
+    } else { images=images.filter(i=>i.id!==id); renderGallery(); }
+}
+
+async function clearAll() {
+    if(!confirm('确定清空所有图片（含云端）？')) return;
+    const ghImgs=images.filter(i=>i.source==='GitHub');
+    setSyncStatus('syncing',`⟳ 删除中 0/${ghImgs.length}`);
+    let done=0;
+    for(const img of ghImgs) {
+        const latestSha=await getLatestSha(img.name);
+        if(!latestSha) continue;
+        await fetch(apiUrl(CFG.path+img.name),{method:'DELETE',headers:authH(),
+            body:JSON.stringify({message:`删除 ${img.name}`,sha:latestSha,branch:CFG.branch})});
+        done++; setSyncStatus('syncing',`⟳ 删除中 ${done}/${ghImgs.length}`);
+    }
+    images=images.filter(i=>i.source!=='GitHub');
+    renderGallery();
+    await fetchImages(0);
+}
+
+// ══ UI 辅助 ══
+function setSyncStatus(s,t){ const el=document.getElementById('syncStatus'); el.className='sync-badge '+s; el.textContent=t; }
+function setProgress(id,pct){ const el=document.getElementById(id); if(el) el.style.width=pct+'%'; }
+function showToast(msg,type='success'){
+    const t=document.createElement('div'); t.className='toast';
+    t.style.cssText=`background:${type==='error'?'#f85149':type==='success'?'#3fb950':'#58a6ff'};color:#fff;box-shadow:0 4px 20px rgba(0,0,0,.3)`;
+    t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500);
+}
+
+// ══ 事件绑定 ══
+document.getElementById('fileInput').addEventListener('change', async e=>{
+    const files=Array.from(e.target.files);
+    for(let i=0;i<files.length;i++){
+        setProgress('uploadProgress',((i+1)/files.length)*80);
+        const localId=addLocalImage(files[i]);
+        await uploadToGitHub(files[i],'uploadProgress',localId);
+    }
+    e.target.value='';
+});
+const uz=document.getElementById('uploadZone');
+uz.addEventListener('dragover', e=>{ e.preventDefault(); uz.classList.add('drag-over'); });
+uz.addEventListener('dragleave', ()=>uz.classList.remove('drag-over'));
+uz.addEventListener('drop', async e=>{
+    e.preventDefault(); uz.classList.remove('drag-over');
+    const files=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/')||f.name.match(/\.(heic|heif|avif|tiff?|bmp|ico|svg|raw|cr2|nef|arw|dng|orf|pef|rw2)$/i));
+    for(const f of files){ const localId=addLocalImage(f); await uploadToGitHub(f,'uploadProgress',localId); }
+});
+document.addEventListener('paste', e=>{
+    if(document.getElementById('appScreen').style.display==='none') return;
+    handlePaste(e);
+    const pz=document.getElementById('pasteZone'); pz.classList.add('paste-active');
+    setTimeout(()=>pz.classList.remove('paste-active'),800);
+});
+document.getElementById('urlInput').addEventListener('keydown', e=>{ if(e.key==='Enter') addByUrl(); });
+</script>
+</body>
+</html>

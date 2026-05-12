@@ -1,35 +1,35 @@
 {
   "version": 2,
-  "lastUpdated": 1778579711048,
+  "lastUpdated": 1778579889997,
   "categories": [
     {
       "id": "cat-1",
-      "name": "风景",
+      "name": "é£æ¯",
       "color": "#3fb950"
     },
     {
       "id": "cat-2",
-      "name": "人物",
+      "name": "äººç©",
       "color": "#58a6ff"
     },
     {
       "id": "cat-3",
-      "name": "美食",
+      "name": "ç¾é£",
       "color": "#f0883e"
     }
   ],
   "folders": [
     {
       "id": "folder-1778579544796",
-      "name": "美食"
+      "name": "ç¾é£"
     },
     {
       "id": "folder-1778579585691",
-      "name": "宠物"
+      "name": "美食"
     },
     {
       "id": "folder-1778579588739",
-      "name": "人像"
+      "name": "äººå"
     }
   ],
   "imgMeta": {

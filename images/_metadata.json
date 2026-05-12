@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "lastUpdated": 1778579545599,
+  "categories": [
+    {
+      "id": "cat-1",
+      "name": "风景",
+      "color": "#3fb950"
+    },
+    {
+      "id": "cat-2",
+      "name": "人物",
+      "color": "#58a6ff"
+    },
+    {
+      "id": "cat-3",
+      "name": "美食",
+      "color": "#f0883e"
+    }
+  ],
+  "folders": [
+    {
+      "id": "folder-1778579544796",
+      "name": "美食"
+    }
+  ],
+  "imgMeta": {}
+}

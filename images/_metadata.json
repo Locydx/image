@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "lastUpdated": 1778579579319,
+  "lastUpdated": 1778579586495,
   "categories": [
     {
       "id": "cat-1",
@@ -22,6 +22,10 @@
     {
       "id": "folder-1778579544796",
       "name": "美食"
+    },
+    {
+      "id": "folder-1778579585691",
+      "name": "宠物"
     }
   ],
   "imgMeta": {

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "lastUpdated": 1778579545599,
+  "lastUpdated": 1778579569278,
   "categories": [
     {
       "id": "cat-1",
@@ -24,5 +24,9 @@
       "name": "美食"
     }
   ],
-  "imgMeta": {}
+  "imgMeta": {
+    "gh-9b7b9865": {
+      "folderId": "folder-1778579544796"
+    }
+  }
 }

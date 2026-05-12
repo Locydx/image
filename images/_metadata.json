@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "lastUpdated": 1778579706929,
+  "lastUpdated": 1778579711048,
   "categories": [
     {
       "id": "cat-1",
@@ -63,7 +63,8 @@
     "gh-5e93609c": {
       "uploadDate": 1778579706126,
       "size": 3017775,
-      "displayName": "d63abee5-e0e9-41d9-a14c-dff4b3a66a77.jpeg"
+      "displayName": "d63abee5-e0e9-41d9-a14c-dff4b3a66a77.jpeg",
+      "folderId": "folder-1778579585691"
     }
   }
 }

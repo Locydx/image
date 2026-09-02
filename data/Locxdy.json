@@ -3,6 +3,10 @@
     {
       "id": "folder-1788335306595",
       "name": "美食"
+    },
+    {
+      "id": "folder-1788336125949",
+      "name": "人像"
     }
   ],
   "categories": [
@@ -234,5 +238,5 @@
       "displayName": "1778662526004-atrfs.png"
     }
   },
-  "updatedAt": 1788335457901
+  "updatedAt": 1788336126551
 }

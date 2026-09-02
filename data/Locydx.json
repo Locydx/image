@@ -18,16 +18,21 @@
     }
   ],
   "imgMeta": {
-    "local-1": {
-      "uploadDate": 1788332510818,
-      "size": 1487784,
-      "displayName": "00873385-c414-4dfc-bac3-7c77f98f9688.jpg"
-    },
     "local-2": {
       "uploadDate": 1788332517377,
       "size": 595813,
       "displayName": "82bf3d1c-8bae-4c16-b8f2-a5fdc3134b87.jpg"
+    },
+    "gh-7de0761f": {
+      "uploadDate": 1788332518680,
+      "size": 1487784,
+      "displayName": "00873385-c414-4dfc-bac3-7c77f98f9688.jpg"
+    },
+    "local-3": {
+      "uploadDate": 1788332518681,
+      "size": 595813,
+      "displayName": "82bf3d1c-8bae-4c16-b8f2-a5fdc3134b87.jpg"
     }
   },
-  "updatedAt": 1788332518180
+  "updatedAt": 1788332519481
 }

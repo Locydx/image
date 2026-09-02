@@ -90,12 +90,6 @@
       "displayName": "7fbe8a09031bdf36da6e0696441575ce.jpg",
       "folderId": "folder-1778637943530"
     },
-    "gh-d287e1e7": {
-      "uploadDate": 1778638104184,
-      "size": 18772635,
-      "displayName": "fd6fba352d987ed22f9de7c3d30be465.jpg",
-      "folderId": "folder-1778637943530"
-    },
     "gh-e70dea29": {
       "uploadDate": 1778638123863,
       "size": 418843,
@@ -4381,5 +4375,5 @@
       "folderId": "folder-1778636046424"
     }
   },
-  "updatedAt": 1788333251175
+  "updatedAt": 1788333276266
 }

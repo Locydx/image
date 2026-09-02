@@ -90,18 +90,6 @@
       "displayName": "7fbe8a09031bdf36da6e0696441575ce.jpg",
       "folderId": "folder-1778637943530"
     },
-    "gh-84704057": {
-      "uploadDate": 1778638152778,
-      "size": 249317,
-      "displayName": "c75183a0a8f966d60451b8ff21e81cd0.jpg",
-      "folderId": "folder-1778637943530"
-    },
-    "gh-d47a95ab": {
-      "uploadDate": 1778638161148,
-      "size": 396818,
-      "displayName": "95579958f9d282c73acce4a705405dd6.jpg",
-      "folderId": "folder-1778637943530"
-    },
     "gh-3cd3ac79": {
       "uploadDate": 1778638178459,
       "size": 321862,
@@ -4363,5 +4351,5 @@
       "folderId": "folder-1778636046424"
     }
   },
-  "updatedAt": 1788333280337
+  "updatedAt": 1788333283548
 }

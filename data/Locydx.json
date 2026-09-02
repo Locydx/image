@@ -1,0 +1,28 @@
+{
+  "folders": [],
+  "categories": [
+    {
+      "id": "cat-1",
+      "name": "风景",
+      "color": "#3fb950"
+    },
+    {
+      "id": "cat-2",
+      "name": "人物",
+      "color": "#58a6ff"
+    },
+    {
+      "id": "cat-3",
+      "name": "美食",
+      "color": "#f0883e"
+    }
+  ],
+  "imgMeta": {
+    "local-1": {
+      "uploadDate": 1788332510818,
+      "size": 1487784,
+      "displayName": "00873385-c414-4dfc-bac3-7c77f98f9688.jpg"
+    }
+  },
+  "updatedAt": 1788332511622
+}

@@ -204,18 +204,6 @@
       "displayName": "d87a9356-598c-4a19-9465-6b6779c64310.jpeg",
       "folderId": "folder-1778638699947"
     },
-    "gh-24a5bd0e": {
-      "uploadDate": 1778638939235,
-      "size": 253526,
-      "displayName": "f73565bb-30f5-4ccb-aff6-7ff6ef685052.jpeg",
-      "folderId": "folder-1778638699947"
-    },
-    "gh-88099f1e": {
-      "uploadDate": 1778638940609,
-      "size": 175345,
-      "displayName": "abc32482-d77f-4c26-89cd-039fa93f0523.jpeg",
-      "folderId": "folder-1778638699947"
-    },
     "gh-e0415701": {
       "uploadDate": 1778638982886,
       "size": 320652,
@@ -4411,5 +4399,5 @@
       "folderId": "folder-1778636046424"
     }
   },
-  "updatedAt": 1788332440451
+  "updatedAt": 1788332445921
 }

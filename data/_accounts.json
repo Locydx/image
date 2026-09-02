@@ -3,5 +3,10 @@
     "salt": "6887c3424838a697d7a1a8dbbf0c34c6",
     "hash": "8ab6de5947867208b6cc47fe1dc9528671d6b9b0f4023bbc46d4d47a61e5ca3b",
     "createdAt": 1788329134667
+  },
+  "Locxdy": {
+    "salt": "4858e798f2b4a8be4434afc34c4491cf",
+    "hash": "24f57f440ac24d02e15f8c5301fae2150a224f6e3ea68284307ee2098ac41903",
+    "createdAt": 1788330993244
   }
 }

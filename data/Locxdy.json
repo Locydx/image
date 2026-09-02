@@ -1,5 +1,10 @@
 {
-  "folders": [],
+  "folders": [
+    {
+      "id": "folder-1788335306595",
+      "name": "美食"
+    }
+  ],
   "categories": [
     {
       "id": "cat-1",
@@ -18,5 +23,5 @@
     }
   ],
   "imgMeta": {},
-  "updatedAt": 1788335277635
+  "updatedAt": 1788335307398
 }

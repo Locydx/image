@@ -3,17 +3,17 @@
   "categories": [
     {
       "id": "cat-1",
-      "name": "风景",
+      "name": "é£æ¯",
       "color": "#3fb950"
     },
     {
       "id": "cat-2",
-      "name": "人物",
+      "name": "äººç©",
       "color": "#58a6ff"
     },
     {
       "id": "cat-3",
-      "name": "美食",
+      "name": "ç¾é£",
       "color": "#f0883e"
     }
   ],
@@ -22,17 +22,7 @@
       "uploadDate": 1788332517377,
       "size": 595813,
       "displayName": "82bf3d1c-8bae-4c16-b8f2-a5fdc3134b87.jpg"
-    },
-    "gh-7de0761f": {
-      "uploadDate": 1788332518680,
-      "size": 1487784,
-      "displayName": "00873385-c414-4dfc-bac3-7c77f98f9688.jpg"
-    },
-    "gh-08da39ad": {
-      "uploadDate": 1788332522677,
-      "size": 595813,
-      "displayName": "82bf3d1c-8bae-4c16-b8f2-a5fdc3134b87.jpg"
     }
   },
-  "updatedAt": 1788332534634
+  "updatedAt": 1788332664705
 }

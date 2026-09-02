@@ -1,5 +1,10 @@
 {
-  "folders": [],
+  "folders": [
+    {
+      "id": "folder-1788335968413",
+      "name": "美食"
+    }
+  ],
   "categories": [
     {
       "id": "cat-1",
@@ -24,5 +29,5 @@
       "displayName": "82bf3d1c-8bae-4c16-b8f2-a5fdc3134b87.jpg"
     }
   },
-  "updatedAt": 1788332664705
+  "updatedAt": 1788335969022
 }

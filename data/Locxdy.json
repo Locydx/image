@@ -246,8 +246,9 @@
     "local-1": {
       "uploadDate": 1788336678080,
       "size": 1487784,
-      "displayName": "00873385-c414-4dfc-bac3-7c77f98f9688.jpg"
+      "displayName": "00873385-c414-4dfc-bac3-7c77f98f9688.jpg",
+      "folderId": "folder-1788335306595"
     }
   },
-  "updatedAt": 1788336680726
+  "updatedAt": 1788336683007
 }

@@ -248,12 +248,6 @@
       "displayName": "30个装主图 (12).jpg",
       "folderId": "folder-1788336125949"
     },
-    "local-3": {
-      "uploadDate": 1788414158173,
-      "size": 1068715,
-      "displayName": "30个装主图 (24).jpg",
-      "folderId": "folder-1788335306595"
-    },
     "gh-fbd0f6aa": {
       "folderId": "folder-1788336125949"
     },
@@ -268,7 +262,13 @@
       "size": 1257211,
       "displayName": "30个装主图 (23).jpg",
       "folderId": "folder-1788335306595"
+    },
+    "gh-ee28cfb9": {
+      "uploadDate": 1788414162753,
+      "size": 1068715,
+      "displayName": "30个装主图 (24).jpg",
+      "folderId": "folder-1788335306595"
     }
   },
-  "updatedAt": 1788414158783
+  "updatedAt": 1788414163366
 }

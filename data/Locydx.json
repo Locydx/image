@@ -1,0 +1,27 @@
+{
+  "folders": [
+    {
+      "id": "folder-1788424204599",
+      "name": "美食"
+    }
+  ],
+  "categories": [
+    {
+      "id": "cat-1",
+      "name": "é£æ¯",
+      "color": "#3fb950"
+    },
+    {
+      "id": "cat-2",
+      "name": "äººç©",
+      "color": "#58a6ff"
+    },
+    {
+      "id": "cat-3",
+      "name": "ç¾é£",
+      "color": "#f0883e"
+    }
+  ],
+  "imgMeta": {},
+  "updatedAt": 1788424205209
+}

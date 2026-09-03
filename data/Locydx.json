@@ -26,6 +26,13 @@
       "color": "#f0883e"
     }
   ],
-  "imgMeta": {},
-  "updatedAt": 1788424211210
+  "imgMeta": {
+    "local-1": {
+      "uploadDate": 1788424236462,
+      "size": 431351,
+      "displayName": "1778203538027-0pvqn.png",
+      "folderId": "folder-1788424204599"
+    }
+  },
+  "updatedAt": 1788424237064
 }

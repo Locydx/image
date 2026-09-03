@@ -257,12 +257,18 @@
     "gh-fbd0f6aa": {
       "folderId": "folder-1788336125949"
     },
-    "local-1": {
-      "uploadDate": 1788414146739,
+    "gh-bb6a5cd1": {
+      "uploadDate": 1788414153311,
       "size": 1506781,
       "displayName": "30个装主图 (22).jpg",
       "folderId": "folder-1788335306595"
+    },
+    "local-2": {
+      "uploadDate": 1788414153311,
+      "size": 1257211,
+      "displayName": "30个装主图 (23).jpg",
+      "folderId": "folder-1788335306595"
     }
   },
-  "updatedAt": 1788414147339
+  "updatedAt": 1788414153912
 }

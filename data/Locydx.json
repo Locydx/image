@@ -27,14 +27,8 @@
     }
   ],
   "imgMeta": {
-    "local-3": {
-      "uploadDate": 1788427129027,
-      "size": 464688,
-      "displayName": "1778203579061-e3zfj.png",
-      "folderId": "folder-1788424204599"
-    },
     "local-4": {
-      "uploadDate": 1788424245985,
+      "uploadDate": 1788427132135,
       "size": 438826,
       "displayName": "1778204556468-4om04.png",
       "folderId": "folder-1788424204599"
@@ -162,7 +156,13 @@
       "uploadDate": 1788427129026,
       "size": 475555,
       "displayName": "1778203563804-qwiy1.png"
+    },
+    "gh-e83c0026": {
+      "uploadDate": 1788427132133,
+      "size": 464688,
+      "displayName": "1778203579061-e3zfj.png",
+      "folderId": "folder-1788424204599"
     }
   },
-  "updatedAt": 1788427129639
+  "updatedAt": 1788427132739
 }

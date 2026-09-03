@@ -32,12 +32,6 @@
       "size": 427813,
       "displayName": "1778479152813-02hzu.png"
     },
-    "local-2": {
-      "uploadDate": 1788414026122,
-      "size": 1262938,
-      "displayName": "30个装主图 (12).jpg",
-      "folderId": "folder-1788336125949"
-    },
     "gh-92d871da": {
       "uploadDate": 1788335334851,
       "size": 475555,
@@ -247,7 +241,19 @@
       "uploadDate": 1788414011089,
       "size": 1420690,
       "displayName": "30个装主图 (8).jpg"
+    },
+    "gh-2451b54c": {
+      "uploadDate": 1788414032389,
+      "size": 1262938,
+      "displayName": "30个装主图 (12).jpg",
+      "folderId": "folder-1788336125949"
+    },
+    "local-3": {
+      "uploadDate": 1788414032390,
+      "size": 1344331,
+      "displayName": "30个装主图 (13).jpg",
+      "folderId": "folder-1788336125949"
     }
   },
-  "updatedAt": 1788414026733
+  "updatedAt": 1788414033004
 }

@@ -8,5 +8,10 @@
     "salt": "577f8a5641ec820415bd65923f0e0503",
     "hash": "acb199e0c8a81ad64e84ecc75749c96ad84de9340ebcd9d0532bd7ed518968a4",
     "createdAt": 1788424121505
+  },
+  "Locydx": {
+    "salt": "742c03e03c681264a080ee8252757b38",
+    "hash": "8e45649c85c50dcf0118f28d1a807927fb40a6c8afa6aae368e4c3d48f34c4db",
+    "createdAt": 1788424144310
   }
 }

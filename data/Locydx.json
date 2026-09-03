@@ -27,12 +27,18 @@
     }
   ],
   "imgMeta": {
-    "local-1": {
-      "uploadDate": 1788424236462,
+    "gh-9b7b9865": {
+      "uploadDate": 1788424240202,
       "size": 431351,
       "displayName": "1778203538027-0pvqn.png",
       "folderId": "folder-1788424204599"
+    },
+    "local-2": {
+      "uploadDate": 1788424240202,
+      "size": 475555,
+      "displayName": "1778203563804-qwiy1.png",
+      "folderId": "folder-1788424204599"
     }
   },
-  "updatedAt": 1788424237064
+  "updatedAt": 1788424240804
 }

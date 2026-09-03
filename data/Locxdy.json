@@ -36,7 +36,13 @@
       "uploadDate": 1788424303292,
       "size": 1162597,
       "displayName": "30个装主图 (2).jpg"
+    },
+    "local-1": {
+      "uploadDate": 1788424318056,
+      "size": 1162597,
+      "displayName": "30个装主图 (2).jpg",
+      "folderId": "folder-1788424130399"
     }
   },
-  "updatedAt": 1788424303893
+  "updatedAt": 1788424318662
 }

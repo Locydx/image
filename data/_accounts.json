@@ -13,5 +13,10 @@
     "salt": "742c03e03c681264a080ee8252757b38",
     "hash": "8e45649c85c50dcf0118f28d1a807927fb40a6c8afa6aae368e4c3d48f34c4db",
     "createdAt": 1788424144310
+  },
+  "alice": {
+    "salt": "8f86f47d8e430be7e4f4cee942c20451",
+    "hash": "9d6ff426c8d782430bc2e1c51066207b45f1d27fe891186abc97a8b1a3ece446",
+    "createdAt": 1788424860809
   }
 }

@@ -265,9 +265,10 @@
       "folderId": "folder-1788424210599"
     },
     "gh-3cd3ac79": {
-      "uploadDate": 1788429447666,
+      "uploadDate": 1788512626629,
       "size": 321862,
-      "displayName": "1778638176968-yyhai.jpg"
+      "displayName": "1778638176968-yyhai.jpg",
+      "folderId": "folder-1788424210599"
     },
     "gh-cc84f0e0": {
       "uploadDate": 1788429470552,
@@ -314,12 +315,12 @@
       "displayName": "1778638097154-tw4iy.jpg",
       "folderId": "folder-1788424210599"
     },
-    "local-52": {
-      "uploadDate": 1788512623476,
-      "size": 321862,
-      "displayName": "1778638176968-yyhai.jpg",
+    "local-53": {
+      "uploadDate": 1788512626630,
+      "size": 20187421,
+      "displayName": "1778638179608-fef07.jpg",
       "folderId": "folder-1788424210599"
     }
   },
-  "updatedAt": 1788512624128
+  "updatedAt": 1788512628125
 }

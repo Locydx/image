@@ -1,0 +1,512 @@
+/**
+ * 阿里云 FC Web 函数完整版（不依赖 fetch，兼容旧 Node）
+ * 启动：node index.js
+ * 监听：0.0.0.0 + PORT/FC_SERVER_PORT/9000
+ */
+
+const http = require('http');
+const https = require('https');
+
+const PORT = Number(process.env.PORT || process.env.FC_SERVER_PORT || 9000);
+
+const server = http.createServer(function (req, res) {
+  setCors(res);
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
+  readBody(req)
+    .then(function (raw) {
+      var body = {};
+      try {
+        if (raw) body = JSON.parse(raw);
+      } catch (e) {}
+
+      var url = new URL(req.url || '/', 'http://localhost');
+      var action = body.action || url.searchParams.get('action');
+
+      if (!action) {
+        return sendJson(res, 400, { ok: false, error: 'unknown action' });
+      }
+
+      var p;
+      if (['pull', 'push', 'accounts_pull', 'accounts_push'].indexOf(action) >= 0) {
+        p = handleJsonSync(action, body, url.searchParams);
+      } else if (['list', 'upload', 'delete'].indexOf(action) >= 0) {
+        p = handleFileProxy(action, body);
+      } else if (action === 'ai_recommend') {
+        p = handleAiRecommend(body);
+      } else {
+        return sendJson(res, 400, { ok: false, error: 'unknown action: ' + action });
+      }
+
+      return p.then(function (result) {
+        sendJson(res, 200, result);
+      });
+    })
+    .catch(function (e) {
+      console.error(e);
+      sendJson(res, 500, { ok: false, error: e.message || String(e) });
+    });
+});
+
+server.listen(PORT, '0.0.0.0', function () {
+  console.log('listening 0.0.0.0:' + PORT);
+});
+
+function setCors(res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Sync-Secret');
+}
+
+function sendJson(res, code, obj) {
+  var data = JSON.stringify(obj);
+  res.writeHead(code, {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Content-Length': Buffer.byteLength(data),
+  });
+  res.end(data);
+}
+
+function readBody(req) {
+  return new Promise(function (resolve, reject) {
+    var chunks = [];
+    req.on('data', function (c) {
+      chunks.push(c);
+    });
+    req.on('end', function () {
+      resolve(Buffer.concat(chunks).toString('utf8'));
+    });
+    req.on('error', reject);
+  });
+}
+
+function env(k, d) {
+  return process.env[k] || d || '';
+}
+
+function getConfig(body) {
+  body = body || {};
+  return {
+    owner: String(body.owner || env('GITHUB_OWNER', 'Locydx')).trim(),
+    repo: String(body.repo || env('GITHUB_REPO', 'image')).trim(),
+    branch: String(body.branch || env('GITHUB_BRANCH', 'main')).trim(),
+    token: env('GITHUB_TOKEN', ''),
+    path: String(body.path || env('IMAGE_PATH', 'images/')).replace(/\/?$/, '/'),
+  };
+}
+
+function utf8ToBase64(str) {
+  return Buffer.from(str, 'utf8').toString('base64');
+}
+
+function base64ToUtf8(b64) {
+  return Buffer.from(String(b64).replace(/\n/g, ''), 'base64').toString('utf8');
+}
+
+function httpsJson(method, urlStr, token, bodyObj) {
+  return new Promise(function (resolve, reject) {
+    var u = new URL(urlStr);
+    var payload = bodyObj ? JSON.stringify(bodyObj) : null;
+    var headers = {
+      Accept: 'application/vnd.github+json',
+      'User-Agent': 'Aliyun-FC-Sync',
+      'Content-Type': 'application/json',
+    };
+    if (token) headers.Authorization = 'token ' + token;
+    if (payload) headers['Content-Length'] = Buffer.byteLength(payload);
+
+    var req = https.request(
+      {
+        hostname: u.hostname,
+        path: u.pathname + u.search,
+        method: method || 'GET',
+        headers: headers,
+      },
+      function (res) {
+        var chunks = [];
+        res.on('data', function (c) {
+          chunks.push(c);
+        });
+        res.on('end', function () {
+          var text = Buffer.concat(chunks).toString('utf8');
+          if (res.statusCode === 204) {
+            resolve(null);
+            return;
+          }
+          var data = null;
+          try {
+            data = text ? JSON.parse(text) : null;
+          } catch (e) {
+            data = { message: text };
+          }
+          if (res.statusCode >= 400) {
+            var msg = (data && data.message) || 'HTTP ' + res.statusCode;
+            reject(new Error(msg));
+            return;
+          }
+          resolve(data);
+        });
+      }
+    );
+    req.on('error', reject);
+    if (payload) req.write(payload);
+    req.end();
+  });
+}
+
+function githubGetJson(owner, repo, path, branch, token) {
+  var url =
+    'https://api.github.com/repos/' +
+    owner +
+    '/' +
+    repo +
+    '/contents/' +
+    path +
+    '?ref=' +
+    branch;
+  return httpsJson('GET', url, token).then(
+    function (data) {
+      if (!data || !data.content) return null;
+      return JSON.parse(base64ToUtf8(data.content));
+    },
+    function (err) {
+      if (String(err.message).indexOf('Not Found') >= 0 || String(err.message).indexOf('404') >= 0) {
+        return null;
+      }
+      throw err;
+    }
+  );
+}
+
+function githubPutJson(owner, repo, path, branch, token, obj, message) {
+  var getUrl =
+    'https://api.github.com/repos/' +
+    owner +
+    '/' +
+    repo +
+    '/contents/' +
+    path +
+    '?ref=' +
+    branch;
+  return httpsJson('GET', getUrl, token)
+    .then(
+      function (existing) {
+        return existing && existing.sha ? existing.sha : null;
+      },
+      function () {
+        return null;
+      }
+    )
+    .then(function (sha) {
+      var putUrl = 'https://api.github.com/repos/' + owner + '/' + repo + '/contents/' + path;
+      var body = {
+        message: message,
+        content: utf8ToBase64(JSON.stringify(obj, null, 2)),
+        branch: branch,
+      };
+      if (sha) body.sha = sha;
+      return httpsJson('PUT', putUrl, token, body);
+    });
+}
+
+function githubList(owner, repo, path, branch, token) {
+  var url =
+    'https://api.github.com/repos/' +
+    owner +
+    '/' +
+    repo +
+    '/contents/' +
+    path +
+    '?ref=' +
+    branch;
+  return httpsJson('GET', url, token).then(
+    function (data) {
+      return Array.isArray(data) ? data : [];
+    },
+    function (err) {
+      if (String(err.message).indexOf('Not Found') >= 0 || String(err.message).indexOf('404') >= 0) {
+        return [];
+      }
+      throw err;
+    }
+  );
+}
+
+function githubPutFile(owner, repo, path, branch, token, base64content, message) {
+  var getUrl =
+    'https://api.github.com/repos/' +
+    owner +
+    '/' +
+    repo +
+    '/contents/' +
+    path +
+    '?ref=' +
+    branch;
+  return httpsJson('GET', getUrl, token)
+    .then(
+      function (existing) {
+        return existing && existing.sha ? existing.sha : null;
+      },
+      function () {
+        return null;
+      }
+    )
+    .then(function (sha) {
+      var putUrl = 'https://api.github.com/repos/' + owner + '/' + repo + '/contents/' + path;
+      var body = {
+        message: message,
+        content: base64content,
+        branch: branch,
+      };
+      if (sha) body.sha = sha;
+      return httpsJson('PUT', putUrl, token, body);
+    });
+}
+
+function githubDeleteFile(owner, repo, path, branch, token, sha, message) {
+  var url = 'https://api.github.com/repos/' + owner + '/' + repo + '/contents/' + path;
+  return httpsJson('DELETE', url, token, {
+    message: message,
+    sha: sha,
+    branch: branch,
+  });
+}
+
+function handleJsonSync(action, body, searchParams) {
+  var nick = String((body && body.nick) || searchParams.get('nick') || '').trim();
+  if (!nick || nick.length < 2 || nick.length > 16) {
+    return Promise.resolve({ ok: false, error: 'nick required (2-16 chars)' });
+  }
+  var safeNick = nick.replace(/[\/\\:*?"<>|]/g, '_');
+  var cfg = getConfig(body);
+  if (!cfg.token) return Promise.resolve({ ok: false, error: 'GITHUB_TOKEN not set' });
+
+  if (action === 'accounts_pull') {
+    return githubGetJson(cfg.owner, cfg.repo, 'data/_accounts.json', cfg.branch, cfg.token).then(
+      function (data) {
+        return { ok: true, exists: !!data, data: data || {} };
+      }
+    );
+  }
+
+  if (action === 'accounts_push') {
+    return githubGetJson(cfg.owner, cfg.repo, 'data/_accounts.json', cfg.branch, cfg.token).then(
+      function (existing) {
+        var merged = Object.assign({}, existing || {}, (body && body.accounts) || {});
+        return githubPutJson(
+          cfg.owner,
+          cfg.repo,
+          'data/_accounts.json',
+          cfg.branch,
+          cfg.token,
+          merged,
+          'update accounts'
+        ).then(function () {
+          return { ok: true };
+        });
+      }
+    );
+  }
+
+  if (action === 'pull') {
+    return githubGetJson(
+      cfg.owner,
+      cfg.repo,
+      'data/' + safeNick + '.json',
+      cfg.branch,
+      cfg.token
+    ).then(function (data) {
+      return { ok: true, exists: !!data, data: data || null };
+    });
+  }
+
+  if (action === 'push') {
+    var payload = Object.assign({}, body);
+    delete payload.action;
+    delete payload.nick;
+    delete payload.owner;
+    delete payload.repo;
+    delete payload.branch;
+    delete payload.path;
+    return githubPutJson(
+      cfg.owner,
+      cfg.repo,
+      'data/' + safeNick + '.json',
+      cfg.branch,
+      cfg.token,
+      payload,
+      'sync ' + safeNick
+    ).then(function () {
+      return { ok: true, path: 'data/' + safeNick + '.json' };
+    });
+  }
+
+  return Promise.resolve({ ok: false, error: 'unknown json action' });
+}
+
+function handleFileProxy(action, body) {
+  var cfg = getConfig(body);
+  if (!cfg.token) return Promise.resolve({ ok: false, error: 'GITHUB_TOKEN not set' });
+
+  if (action === 'list') {
+    return githubList(cfg.owner, cfg.repo, cfg.path, cfg.branch, cfg.token).then(function (files) {
+      var images = (files || [])
+        .filter(function (f) {
+          return (
+            f.type === 'file' &&
+            /\.(png|jpe?g|gif|webp|avif|bmp|ico|svg|tiff?|heic|heif)$/i.test(f.name)
+          );
+        })
+        .map(function (f) {
+          return {
+            id: 'gh-' + String(f.sha).slice(0, 8),
+            name: f.name,
+            url: f.download_url,
+            sha: f.sha,
+            source: 'GitHub',
+          };
+        });
+      return { ok: true, images: images, path: cfg.path };
+    });
+  }
+
+  if (action === 'upload') {
+    var name = body && body.name;
+    var content = body && body.content;
+    if (!name || !content) {
+      return Promise.resolve({ ok: false, error: 'name + content required' });
+    }
+    return githubPutFile(
+      cfg.owner,
+      cfg.repo,
+      cfg.path + name,
+      cfg.branch,
+      cfg.token,
+      content,
+      (body && body.message) || 'upload ' + name
+    ).then(function (result) {
+      return { ok: true, content: result && result.content };
+    });
+  }
+
+  if (action === 'delete') {
+    var dname = body && body.name;
+    var sha = body && body.sha;
+    if (!dname || !sha) {
+      return Promise.resolve({ ok: false, error: 'name + sha required' });
+    }
+    return githubDeleteFile(
+      cfg.owner,
+      cfg.repo,
+      cfg.path + dname,
+      cfg.branch,
+      cfg.token,
+      sha,
+      (body && body.message) || 'delete ' + dname
+    ).then(function () {
+      return { ok: true };
+    });
+  }
+
+  return Promise.resolve({ ok: false, error: 'unknown file action' });
+}
+
+function handleAiRecommend(body) {
+  var apiKey = env('QWEN_API_KEY') || env('AI_API_KEY') || env('DASHSCOPE_API_KEY');
+  if (!apiKey) {
+    return Promise.resolve({ ok: false, error: 'QWEN_API_KEY not set' });
+  }
+
+  var height = Number(body && body.height);
+  var weight = Number(body && body.weight);
+  var filterLabel = (body && body.filterLabel) || 'balanced';
+  if (!height || !weight || height < 100 || height > 250 || weight < 30 || weight > 300) {
+    return Promise.resolve({ ok: false, error: 'invalid height or weight' });
+  }
+
+  var bmi = weight / Math.pow(height / 100, 2);
+  var label = 'normal';
+  if (bmi < 18.5) label = 'underweight';
+  else if (bmi >= 28) label = 'obese';
+  else if (bmi >= 24) label = 'overweight';
+
+  var prompt =
+    'You are a nutritionist. height=' +
+    height +
+    'cm weight=' +
+    weight +
+    'kg BMI=' +
+    bmi.toFixed(1) +
+    ' (' +
+    label +
+    ') preference=' +
+    filterLabel +
+    '. Recommend 3 categories with 3 dishes each. Return JSON only: {"categories":[{"icon":"x","title":"t","desc":"d","dishes":[{"name":"n","reason":"r"}]}]}';
+
+  var apiUrl = env(
+    'AI_API_URL',
+    'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions'
+  );
+  var u = new URL(apiUrl);
+  var payload = JSON.stringify({
+    model: env('AI_MODEL', 'qwen-plus'),
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.7,
+    max_tokens: 1200,
+  });
+
+  return new Promise(function (resolve, reject) {
+    var req = https.request(
+      {
+        hostname: u.hostname,
+        path: u.pathname + u.search,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + apiKey,
+          'Content-Length': Buffer.byteLength(payload),
+        },
+      },
+      function (res) {
+        var chunks = [];
+        res.on('data', function (c) {
+          chunks.push(c);
+        });
+        res.on('end', function () {
+          var text = Buffer.concat(chunks).toString('utf8');
+          if (res.statusCode >= 400) {
+            reject(new Error('AI API ' + res.statusCode + ': ' + text.slice(0, 200)));
+            return;
+          }
+          try {
+            var data = JSON.parse(text);
+            var content =
+              data.choices &&
+              data.choices[0] &&
+              data.choices[0].message &&
+              data.choices[0].message.content
+                ? data.choices[0].message.content
+                : '';
+            var m = content.match(/\{[\s\S]*\}/);
+            var parsed = JSON.parse(m ? m[0] : content);
+            resolve({
+              ok: true,
+              bmi: bmi.toFixed(1),
+              label: label,
+              categories: parsed.categories || [],
+            });
+          } catch (e) {
+            reject(new Error('AI response parse error'));
+          }
+        });
+      }
+    );
+    req.on('error', reject);
+    req.write(payload);
+    req.end();
+  });
+}

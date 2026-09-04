@@ -18,5 +18,10 @@
     "salt": "8f86f47d8e430be7e4f4cee942c20451",
     "hash": "9d6ff426c8d782430bc2e1c51066207b45f1d27fe891186abc97a8b1a3ece446",
     "createdAt": 1788424860809
+  },
+  "jidu": {
+    "salt": "b52c13857058ce553f674cfc6c5b65b4",
+    "hash": "79e9af695f2e9dd97ae9c1a62381fb107d775fff44c82d8b62b71dc60d903fa0",
+    "createdAt": 1788504934032
   }
 }

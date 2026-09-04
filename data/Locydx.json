@@ -27,12 +27,6 @@
     }
   ],
   "imgMeta": {
-    "local-14": {
-      "uploadDate": 1788512267930,
-      "size": 383554,
-      "displayName": "1778659552466-i1fhj.png",
-      "folderId": "folder-1788424204599"
-    },
     "local-27": {
       "uploadDate": 1788429495884,
       "size": 18019216,
@@ -256,7 +250,7 @@
       "displayName": "1778659528123-9vgxs.png"
     },
     "gh-fb635b18": {
-      "uploadDate": 1788429201353,
+      "uploadDate": 1788512271409,
       "size": 383554,
       "displayName": "1778659552466-i1fhj.png",
       "folderId": "folder-1788424204599"
@@ -310,9 +304,9 @@
       "folderId": "folder-1788424204599"
     },
     "local-15": {
-      "uploadDate": 1788429386688,
-      "size": 12766231,
-      "displayName": "1778638068039-8m3mm.jpg"
+      "uploadDate": 1788512271410,
+      "size": 623383,
+      "displayName": "1778660214939-9gbn5.png"
     },
     "local-16": {
       "uploadDate": 1788429407131,
@@ -371,5 +365,5 @@
       "displayName": "1778638398480-8bkx0.jpg"
     }
   },
-  "updatedAt": 1788512268531
+  "updatedAt": 1788512272023
 }

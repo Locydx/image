@@ -247,9 +247,10 @@
       "folderId": "folder-1788424210599"
     },
     "gh-73c36330": {
-      "uploadDate": 1788429437777,
+      "uploadDate": 1788512617431,
       "size": 537153,
-      "displayName": "1778638140807-dzmx2.jpg"
+      "displayName": "1778638140807-dzmx2.jpg",
+      "folderId": "folder-1788424210599"
     },
     "gh-84704057": {
       "uploadDate": 1788429441003,
@@ -312,12 +313,12 @@
       "displayName": "1778638097154-tw4iy.jpg",
       "folderId": "folder-1788424210599"
     },
-    "local-49": {
-      "uploadDate": 1788512613850,
-      "size": 537153,
-      "displayName": "1778638140807-dzmx2.jpg",
+    "local-50": {
+      "uploadDate": 1788512617432,
+      "size": 249317,
+      "displayName": "1778638151161-tcsr8.jpg",
       "folderId": "folder-1788424210599"
     }
   },
-  "updatedAt": 1788512615123
+  "updatedAt": 1788512618129
 }

@@ -271,9 +271,10 @@
       "folderId": "folder-1788424210599"
     },
     "gh-cc84f0e0": {
-      "uploadDate": 1788429470552,
+      "uploadDate": 1788512670026,
       "size": 244700,
-      "displayName": "1778638192703-bn2m6.jpg"
+      "displayName": "1778638192703-bn2m6.jpg",
+      "folderId": "folder-1788424210599"
     },
     "gh-71dc9e6d": {
       "uploadDate": 1788429493582,
@@ -321,12 +322,12 @@
       "displayName": "1778638179608-fef07.jpg",
       "folderId": "folder-1788424210599"
     },
-    "local-54": {
-      "uploadDate": 1788512666500,
-      "size": 244700,
-      "displayName": "1778638192703-bn2m6.jpg",
+    "local-55": {
+      "uploadDate": 1788512670027,
+      "size": 15707120,
+      "displayName": "1778638219434-yooq2.jpg",
       "folderId": "folder-1788424210599"
     }
   },
-  "updatedAt": 1788512667126
+  "updatedAt": 1788512671123
 }
